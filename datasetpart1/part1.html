@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Scatterplot visualization</title>
+  <style>
+  
+  
+  .alignment{
+    position:absolute;
+    right:100px;
+    
+  }
+  .colorused,
+  .label{
+      display:inline-block;
+  }
+  
+  .colorused{
+    width:10px;
+    height:10px;
+    margin:0px 10px;
+  }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.2/d3.min.js"></script>
+</head>
+<body>
+  <div class='tooltip'></div>
+  <div class='legend'>
+    <div class='alignment'>
+      <div class='colorused' style='background:green'></div>
+      <div class='label'>2018</div>
+      <div class='colorused' style='background:red'></div>
+      <div class='label' >2019</div>
+      <div class='colorused' style='background:violet'></div>
+      <div class='label' >2020</div>
+    </div>
+  </div>
+  <svg width="800" height="800"></svg>
+  <script src="script.js"></script>
+  <script>
+ 
+  
+  
+  const svgwid=800;
+  const svghei=800;
+  
+  const margin={
+    top:100,
+    left:100,
+    bottom:50,
+    right:50
+  }
+  
+  const width=svgwid-(margin.left+margin.right);
+  const height=svghei-(margin.top+margin.bottom);
+  
+  const xDomain=d3.extent(data.map(d=>d.sales));
+  const xRange=[0,width];
+  const xScale=d3.scaleLinear()
+  .domain(xDomain)
+  .range(xRange);
+  
+
+  
+  const yDomain=d3.extent(data.map(d=>d.revenue));
+  const yRange=[height,0];
+  const yScale=d3.scaleLinear()
+  .domain(yDomain)
+  .range(yRange);
+  
+ 
+  const xAxis=d3.axisBottom(xScale);
+  const yAxis=d3.axisLeft(yScale);
+  
+  d3.select("svg")
+  .append("g")
+  .attr("class","xAxis")
+  .attr("transform",`translate(${margin.left},${svghei-margin.bottom})`);
+  
+  d3.select(".xAxis")
+  .append("g")
+  .call(xAxis.ticks(5).tickFormat(d=>'$ '+d))
+  .selectAll("text")
+  .style("font-size","14px");
+  
+  
+  d3.select("svg")
+  .append("g")
+  .attr("class","yAxis")
+  .attr("transform",`translate(${margin.left},${margin.top})`);
+  
+  d3.select(".yAxis")
+  .append("g")
+  .call(yAxis.ticks(5).tickFormat(d=>'$ '+d))
+   .selectAll("text")
+  .style("font-size","14px");
+  
+  d3.select(".xAxis")
+  .append("text")
+  .text("Sales")
+  .attr("x",width/2)
+  .attr("y",margin.bottom * 0.7)
+  .style("font-size","18px")
+  .style("font-weight","bold");
+  
+  
+  d3.select(".yAxis")
+  .append("text")
+  .text("Revenue")
+  .style("transform","rotate(270deg)")
+  .attr("x",height/2 * -1)
+  .attr("y",margin.left * 0.6 * -1)
+  .style("font-size","18px")
+  .style("font-weight","bold");
+  
+  
+  d3.select("svg")
+  .append("g")
+  .attr("class","circle-g")
+  .attr("transform",`translate(${margin.left},${margin.top})`);
+  
+  const color={
+    "2018":"green",
+    "2019":"red",
+    "2020":"purple"
+  }
+  
+  const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+    .domain(d3.extent(data, d => color[d3.timeFormat("%Y")(new Date(d.date))]));
+  
+  d3.select(".circle-g")
+  .selectAll(".circle")
+  .data(data)
+  .enter()
+  .append("circle")
+  .attr("class","circle")
+  .attr("cx",d=>xScale(d.sales))
+  .attr("cy",d=>yScale(d.revenue))
+  .attr("r",5)
+  .style("fill",d=>colorScale(d3.timeFormat("%Y")(new Date(d.date))))
+  ;
+  
+  
+  
+  </script>
+</body>
+</html>
